@@ -1,0 +1,8 @@
+.env
+pass.txt
+hub.ovpn
+__pycache__/
+ANNOTATIONS/
+LOCAL_TEST_VARIABLES
+ifconfig.txt
+*.txt
