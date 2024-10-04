@@ -5,86 +5,185 @@ import sys
 from sendmail import send_mail_my_ip_is_updated, send_mail_vpn_failed
 import re
 from writeandreadip_tunip import writeip
+from myip_windows import is_ipv4, is_apipa_or_loopback
 
-LOG_FILE = "/tmp/updated_interfaces.py.log"
-IFCONFIG_FILE = "/home/dacosta/CALLHOME/ipadd.txt"
+# Define the log file path for Windows
+LOG_FILE = os.path.join(os.getcwd(), "logs", "updated_interfaces.log")
+IFCONFIG_FILE = os.path.join(os.getcwd(), ".", "ipadd.txt")
+
+# Ensure the logs directory exists
+os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+os.makedirs(os.path.dirname(IFCONFIG_FILE), exist_ok=True)
 
 #PHY INTERFACES TO LOOK FOR
-interfaceETH_String = 'eth\\d+'
-interfaceWLAN_String = 'wlan\\d+'
+interfaceETH_String = "Ethernet, Gigabit"
+interfaceWLAN_String = 'Wireless 802.11'
 
-#GET CURRENT NETWORK INFO with IP ADDR SHOW
+#GET CURRENT NETWORK INFO with POWERSHELL
 def get_interfaces_ipv4_from_ifconfig():
+    # PowerShell command to retrieve network interface, IP address, and adapter details
+    command = """
+    Get-NetAdapter | ForEach-Object {
+        $adapter = $_
+        Get-NetIPAddress -InterfaceAlias $adapter.Name | ForEach-Object {
+            [PSCustomObject]@{
+                ConnectionName = $adapter.Name
+                AdapterName = $adapter.InterfaceDescription
+                IPAddress = $_.IPAddress
+            }
+        }
+    } | ConvertTo-Json
+    """
     try:
-        # Run the Linux command to get all interface information
-        result = subprocess.run(["ip", "addr", "show"], capture_output=True, text=True, check=True)
-        output = result.stdout
+        # Run the PowerShell command and capture the output
+        result = subprocess.run(["powershell", "-Command", command], capture_output=True, text=True, check=True)
+        
+        # Parse the JSON output into Python objects (list of dictionaries)
+        interfaces = json.loads(result.stdout)
+        
+        tunnel_ipaddresses = []  # Use a list to store multiple tunnel IP addresses
+        interface_count = 0
+        
+        # Iterate through interfaces and print the details
+        for interface in interfaces:
+            ip_address = interface.get("IPAddress")
+            adapter_name = interface.get("AdapterName")
+            connection_name = interface.get("ConnectionName")
+            
+            # Increment interface count for display
+            interface_count += 1
 
-        if output:
-            return output  # Return IP address information
-        else:
-            print("No IP addresses found.")
-            return None  # Return None if no output from command
+            # Check if the adapter is TAP-Windows or TAP-Win32, and the IP is IPv4
+            if is_ipv4(ip_address):
+                # Check if it's an APIPA (169.254.x.x) or loopback address (127.x.x.x)
+                if not is_apipa_or_loopback(ip_address):  # Only add if it's not APIPA or loopback
+                    tunnel_ipaddresses.append(ip_address)  # Append the valid tunnel IP address
+
+        return tunnel_ipaddresses
+            else:
+            print("No IPv4 address found.")
+            return None
+    
     except subprocess.CalledProcessError as e:
-        print(f"Error: Command 'ip addr show' returned non-zero exit status {e.returncode}")
-        return None  # Return None on command error
-    except Exception as e:
-        print("Error:", e)
-        return None  # Return None on any other exception
+        print(f"An error occurred: {e}")
+        return None
 
-#GET CURRENT IP FOR WLAN AND ETH0
+#GET CURRENT IP FOR WLAN AND ETH0 WITH POWERSHELL
 #TUN INTERFACES WORKS DIFFERENT - THERE'S AN UNIQUE FUNCTION TO GET TUN INFO
-def get_interface_ipv4(interface_pattern):
-    try:
-        # Run the Linux command to get all interface information
-        output = subprocess.check_output(["ip", "addr", "show"]).decode("utf-8")
-        
-        # Debug: Print the output to verify
-        #print(output)
+def get_network_interfaces(interface_pattern):
+    """
+    Retrieves network interfaces matching the given EthernetPattern.
 
-        # Define regex pattern to find interfaces and IP addresses
-        interface_pattern = rf'(\d+):\s({interface_pattern}):.*?state\s(\w+).*?inet\s(\d{{1,3}}\.\d{{1,3}}\.\d{{1,3}}\.\d{{1,3}})/\d+'
-        matches = re.findall(interface_pattern, output, re.DOTALL)
-        
-        # Debug: Print matches to verify
-        #print(matches)
-        
-        # Loop through matches to find the first UP interface with an IP address
-        for _, interface, state, ip_address in matches:
-            if state == 'UP' and ip_address != "127.0.0.1":
-                return interface, ip_address
-        
-        return None, None
-    except subprocess.CalledProcessError:
-        print("Error: Command 'ip addr show' failed.")
-        return None, None
-    except Exception as e:
-        print(f"Error occurred: {str(e)}")
-        return None, None
-
-#GET CURRENT tun IP ADDRESS
-def get_tun_interface_ipv4():
+    Parameters:
+    EthernetPattern (str): A comma-separated string of patterns to match against adapter names.
+    """
+    # Convert EthernetPattern to a list, splitting by commas
+    ethernet_patterns = [pattern.strip() for pattern in EthernetPattern.split(",")]
+    
+    # PowerShell command to retrieve network interface, IP address, and adapter details
+    command = """
+    Get-NetAdapter | ForEach-Object {
+        $adapter = $_
+        Get-NetIPAddress -InterfaceAlias $adapter.Name | ForEach-Object {
+            [PSCustomObject]@{
+                ConnectionName = $adapter.Name
+                AdapterName = $adapter.InterfaceDescription
+                IPAddress = $_.IPAddress
+            }
+        }
+    } | ConvertTo-Json
+    """
     try:
-        # Run the Linux command to get all interface information
-        output = subprocess.check_output(["ip", "addr", "show"]).decode("utf-8")
+        # Run the PowerShell command and capture the output
+        result = subprocess.run(["powershell", "-Command", command], capture_output=True, text=True, check=True)
         
-        # Define regex pattern based on interface_type
-        #match = re.search(r'(tun\d+).*?inet (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', output, re.DOTALL)
-        match = re.search(r'(tun\d+)(?:.*?\n){0,2}.*?inet (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', output)
-                
-        if match:
-            interface_name = match.group(1)
-            ip_address = match.group(2)
-            return interface_name, ip_address
+        # Parse the JSON output into Python objects (list of dictionaries)
+        interfaces = json.loads(result.stdout)
+        
+        ethernet_ipaddresses = []  # Store IP addresses for matching Ethernet adapters
+        interface_count = 0
+        
+        # Iterate through interfaces and check for matching Ethernet adapters
+        for interface in interfaces:
+            ip_address = interface.get("IPAddress")
+            adapter_name = interface.get("AdapterName")
+            connection_name = interface.get("ConnectionName")
+            
+            # Increment interface count for display
+            interface_count += 1
+
+            # Check if the adapter matches any of the patterns in the EthernetPattern list
+            if any(pattern in connection_name for pattern in ethernet_patterns):
+ 
+                # Add the valid IP address to the list
+                if is_ipv4(ip_address) and not is_apipa_or_loopback(ip_address):
+                    ethernet_ipaddresses.append(ip_address)
+        
+        # Return the list of matching Ethernet IP addresses
+        if ethernet_ipaddresses:
+            print("Matching Ethernet IP Addresses:")
+            for addr in ethernet_ipaddresses:
+                print(f"  {addr}")
+            return ethernet_ipaddresses
         else:
-            print(f"No matching interface found with an IPv4 address.")
-            return None, None
-    except subprocess.CalledProcessError:
-        print("Error: Command 'ip addr show' failed.")
-        return None, None
-    except Exception as e:
-        print(f"Error occurred: {str(e)}")
-        return None, None
+            print("No matching Ethernet adapters found.")
+            return False
+    
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred: {e}")
+        return False
+
+#GET CURRENT TUN IP ADDRESS WITH POWERSHELL
+    # PowerShell command to retrieve network interface, IP address, and adapter details
+    command = """
+    Get-NetAdapter | ForEach-Object {
+        $adapter = $_
+        Get-NetIPAddress -InterfaceAlias $adapter.Name | ForEach-Object {
+            [PSCustomObject]@{
+                ConnectionName = $adapter.Name
+                AdapterName = $adapter.InterfaceDescription
+                IPAddress = $_.IPAddress
+            }
+        }
+    } | ConvertTo-Json
+    """
+    try:
+        # Run the PowerShell command and capture the output
+        result = subprocess.run(["powershell", "-Command", command], capture_output=True, text=True, check=True)
+        
+        # Parse the JSON output into Python objects (list of dictionaries)
+        interfaces = json.loads(result.stdout)
+        
+        tunnel_ipaddresses = []  # Use a list to store multiple tunnel IP addresses
+        interface_count = 0
+        
+        # Iterate through interfaces and print the details
+        for interface in interfaces:
+            ip_address = interface.get("IPAddress")
+            adapter_name = interface.get("AdapterName")
+            connection_name = interface.get("ConnectionName")
+            
+            # Increment interface count for display
+            interface_count += 1
+
+            # Check if the adapter is TAP-Windows or TAP-Win32, and the IP is IPv4
+            if ("TAP-Windows Adapter" in adapter_name or "TAP-Win32 Adapter" in adapter_name) and is_ipv4(ip_address):
+                # Check if it's an APIPA (169.254.x.x) or loopback address (127.x.x.x)
+                if not is_apipa_or_loopback(ip_address):  # Only add if it's not APIPA or loopback
+                    tunnel_ipaddresses.append(ip_address)  # Append the valid tunnel IP address
+
+        # If any tunnel IP addresses were found, print them
+        if tunnel_ipaddresses:
+            print("Tunnel IP Addresses:")
+            for addr in tunnel_ipaddresses:
+                print(f"  {addr}")
+                return addr
+        else:
+            print("No matching TAP-Windows Adapter with an IPv4 address found.")
+    
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred: {e}")
+        return None
 
 def get_tun_ipv4():
     getValue = get_tun_interface_ipv4()

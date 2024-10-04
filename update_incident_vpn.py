@@ -1,6 +1,6 @@
 import requests
 import json
-from config import raspberry_vpn_component_id, remote_ssh_server_component_id
+from config import callhome_windows_vpn_component_id, callhome_windows_ssh_server_component_id
 
 #UPDATE INCIDENT FOR HUB VPN
 def update_incident(api_token, page_id, incident_id, name, status, updated_at, body):
@@ -13,8 +13,8 @@ def update_incident(api_token, page_id, incident_id, name, status, updated_at, b
         "incident[status]": status,
         "incident[updated_at]": updated_at,
         "incident[body]": body,
-        f"incident[component_ids][]": [{raspberry_vpn_component_id}],
-        f"incident[components][{raspberry_vpn_component_id}]": "operational"
+        f"incident[component_ids][]": [{callhome_windows_vpn_component_id}],
+        f"incident[components][{callhome_windows_vpn_component_id}]": "operational"
     }
     response = requests.patch(url, headers=headers, data=data)
 
@@ -39,8 +39,8 @@ def update_incident_ssh(api_token, page_id, incident_id, name, status, updated_a
         "incident[status]": status,
         "incident[updated_at]": updated_at,
         "incident[body]": body,
-        f"incident[component_ids][]": [{remote_ssh_server_component_id}],
-        f"incident[components][{remote_ssh_server_component_id}]": "operational"
+        f"incident[component_ids][]": [{callhome_windows_ssh_server_component_id}],
+        f"incident[components][{callhome_windows_ssh_server_component_id}]": "operational"
     }
     response = requests.patch(url, headers=headers, data=data)
 

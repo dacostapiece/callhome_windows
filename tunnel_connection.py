@@ -6,35 +6,111 @@ import socket
 import sys
 import logging
 from ping3 import ping, errors
+import os
+from myip_windows import is_ipv4, is_apipa_or_loopback
+import json
+
+# Define the log file path for Windows
+LOG_FILE_PATH = os.path.join(os.getcwd(), "logs", "tunnel_connection.log")
+
+# Ensure the logs directory exists
+os.makedirs(os.path.dirname(LOG_FILE_PATH), exist_ok=True)
 
 #HUB VPN CHECK
 def check_tun0_ip():
+    # PowerShell command to retrieve network interface, IP address, and adapter details
+    command = """
+    Get-NetAdapter | ForEach-Object {
+        $adapter = $_
+        Get-NetIPAddress -InterfaceAlias $adapter.Name | ForEach-Object {
+            [PSCustomObject]@{
+                ConnectionName = $adapter.Name
+                AdapterName = $adapter.InterfaceDescription
+                IPAddress = $_.IPAddress
+            }
+        }
+    } | ConvertTo-Json
+    """
     try:
-        # Check if tun0 interface has an IP address
-        ip_check = subprocess.check_output(['ip', 'addr', 'show', 'tun0']).decode('utf-8')
-        if 'inet ' in ip_check:
-            return True
-    except subprocess.CalledProcessError:
-        pass
-    return False
+        # Run the PowerShell command and capture the output
+        result = subprocess.run(["powershell", "-Command", command], capture_output=True, text=True, check=True)
+        
+        # Parse the JSON output into Python objects (list of dictionaries)
+        interfaces = json.loads(result.stdout)
+        
+        tunnel_ipaddresses = []  # Use a list to store multiple tunnel IP addresses
+        interface_count = 0
+        
+        # Iterate through interfaces and print the details
+        for interface in interfaces:
+            ip_address = interface.get("IPAddress")
+            adapter_name = interface.get("AdapterName")
+            connection_name = interface.get("ConnectionName")
+            
+            # Increment interface count for display
+            interface_count += 1
+
+            # Check if the adapter is TAP-Windows or TAP-Win32, and the IP is IPv4
+            if ("TAP-Windows Adapter" in adapter_name or "TAP-Win32 Adapter" in adapter_name) and is_ipv4(ip_address):
+                # Check if it's an APIPA (169.254.x.x) or loopback address (127.x.x.x)
+                if not is_apipa_or_loopback(ip_address):  # Only add if it's not APIPA or loopback
+                    tunnel_ipaddresses.append(ip_address)  # Append the valid tunnel IP address
+
+        # If any tunnel IP addresses were found, print them
+        if tunnel_ipaddresses:
+            print("Tunnel IP Addresses:")
+            for addr in tunnel_ipaddresses:
+                print(f"  {addr}")
+                return True
+        else:
+            print("No matching TAP-Windows Adapter with an IPv4 address found.")
+            return False
+    
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred: {e}")
+        return False
 
 #PING3
 def ping_ip(ip, timeout=10):
+    #ip = "172.16.113.4"
     try:
+        # Ensure the IP is a valid string before passing to ping
+        if not isinstance(ip, str) or not ip:
+            raise ValueError(f"Invalid IP address: {ip}")
         # Send ICMP request and get the response time
-        response_time = ping(ip, timeout=timeout)
-        
+        print("\n")
+        print("ping ip funcion")
+        print("early")
+        print("ip: ", ip)
+        print("RESPONSE TIME BROTHER")
         #pdb.set_trace()
+        response_time="Starting Response Time"
+        print("response_time: ", response_time)
+        #RUNNING IS BREAKING HERE
+
+
+        response_time = ping(ip, timeout=timeout)
+        print("RESPONSE TIME SISTER")
+        print("later")
+        print("ip: ", ip)
+        print("response_time: ", response_time)
+
         if response_time is None:
             print(f"Ping to {ip} failed. No response.")
             time.sleep(1)
-            return False
+            return "Falseano brow"  # Return a proper boolean value
         else:
             print(f"Ping to {ip} successful. Response time: {response_time} seconds")
             return True
-    except errors.PingError as e:
+
+    except Exception as e:
         print(f"ICMP error occurred while pinging {ip}: {str(e)}")
         time.sleep(1)
+        return False
+
+    except ValueError as ve:
+        print("ValueError")
+        print(str(ve))
         return False
 
 def check_vpn_connection():
@@ -86,7 +162,7 @@ def check_ssh_connection():
     ssh_server_ip = resolve_dns(ssh_server)
 
     # Open the log file for writing (append mode to keep all output)
-    log_file = '/tmp/tunnel_connection_ssh_script.log'
+    LOG_FILE_PATH
 
      # Check if the SSH server is reachable before starting autossh
     if is_ssh_tunnel_active(ssh_server_ip, ssh_port)==True:

@@ -72,4 +72,5 @@ def is_apipa_or_loopback(ip_address):
     
     return bool(apipa_pattern.match(ip_address) or loopback_pattern.match(ip_address))
 
-get_tun0_ip = get_network_interfaces()
+#get_tun0_ip = get_network_interfaces()
+

@@ -6,3 +6,4 @@ ANNOTATIONS/
 LOCAL_TEST_VARIABLES
 ifconfig.txt
 *.txt
+logs

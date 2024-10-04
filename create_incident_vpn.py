@@ -1,6 +1,6 @@
 import requests
 from datetime import datetime
-from config import raspberry_vpn_component_id, remote_ssh_server_component_id
+from config import callhome_windows_vpn_component_id, callhome_windows_ssh_server_component_id
 
 #CREATE INCIDENT FOR RASPBERRY TO HUB VPN CONNECTION
 def create_incident(api_token, page_id, name, status, impact, monitoring_at, body):
@@ -14,8 +14,8 @@ def create_incident(api_token, page_id, name, status, impact, monitoring_at, bod
         "incident[impact]": impact,
         "incident[monitoring_at]": monitoring_at,
         "incident[body]": body,
-        f"incident[component_ids][]": [{raspberry_vpn_component_id}],
-        f"incident[components][{raspberry_vpn_component_id}]": "partial_outage"
+        f"incident[component_ids][]": [{callhome_windows_vpn_component_id}],
+        f"incident[components][{callhome_windows_vpn_component_id}]": "partial_outage"
     }
     response = requests.post(url, headers=headers, data=data)
 
@@ -63,8 +63,8 @@ def create_incident_ssh(api_token, page_id, name, status, impact, monitoring_at,
         "incident[impact]": impact,
         "incident[monitoring_at]": monitoring_at,
         "incident[body]": body,
-        f"incident[component_ids][]": [{remote_ssh_server_component_id}],
-        f"incident[components][{remote_ssh_server_component_id}]": "partial_outage"
+        f"incident[component_ids][]": [{callhome_windows_ssh_server_component_id}],
+        f"incident[components][{callhome_windows_ssh_server_component_id}]": "partial_outage"
     }
     response = requests.post(url, headers=headers, data=data)
 

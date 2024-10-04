@@ -6,7 +6,8 @@ import subprocess
 import re
 from datetime import datetime
 from config import ZONE_ID, DNS_RECORD_ID, DNS_RECORD_NAME, CF_API_TOKEN
-from get_tun0_ip import myip_windows 
+from myip_windows import get_network_interfaces 
+import pdb
 
 # Define the log file path for Windows
 LOG_FILE_PATH = os.path.join(os.getcwd(), "logs", "update_tun0_ipname.log")
@@ -19,19 +20,6 @@ def log_run_time():
     with open(LOG_FILE_PATH, 'a') as log_file:
         log_file.write("\n")
         log_file.write(f"Script run at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-
-# Function to get the IP address from interface tun0
-def get_tun0_ip():
-    try:
-        # Run the Linux command to get the IP address of the tun0 interface
-        output = subprocess.check_output(["ip", "addr", "show", "tun0"]).decode("utf-8")
-        # Use regular expression to extract the IP address
-        tun0_ip = re.search(r'inet\s+(\d+\.\d+\.\d+\.\d+)', output).group(1)
-        return tun0_ip
-    except subprocess.CalledProcessError:
-        print("Interface tun0 not found.")
-        return None
-
 
 # Function to update DNS record in Cloudflare
 def update_dns_record(ip):
@@ -73,8 +61,9 @@ def update_dns_record(ip):
             log_file.write(f"Failed to fetch DNS record ID.\n")
 
 def main():
-    tun0_ip = get_tun0_ip()
+    tun0_ip = get_network_interfaces()
     log_run_time()  # Fixed indentation here
+    #pdb.set_trace()
     if tun0_ip:
         update_dns_record(tun0_ip)
 

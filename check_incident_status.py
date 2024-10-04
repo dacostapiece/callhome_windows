@@ -1,5 +1,5 @@
 import requests
-from config import raspberry_vpn_component_id, remote_ssh_server_component_id
+from config import callhome_windows_vpn_component_id, callhome_windows_ssh_server_component_id
 
 #HUB VPN INCIDENT
 def list_incident(api_token, page_id):
@@ -43,7 +43,7 @@ def list_incident(api_token, page_id):
         pair_incident = [incident_id, component_ids_isolated]
 
         # Check if the incident is related to Rasp VPN
-        if pair_incident[1] == raspberry_vpn_component_id:
+        if pair_incident[1] == callhome_windows_vpn_component_id:
             print(f"Incident ID {pair_incident[0]} is related to Rasp VPN.")
             #pdb.set_trace()  # Set a breakpoint
             related_incidents.append(pair_incident[0])
@@ -88,7 +88,7 @@ def raw_list_incident(api_token, page_id):
         pair_incident = [incident_id, component_ids_isolated]
         
         # Check if the incident is related to Rasp VPN
-        if pair_incident[1] == raspberry_vpn_component_id:
+        if pair_incident[1] == callhome_windows_vpn_component_id:
             print(f"Incident ID {pair_incident[0]} is related to Rasp VPN.")
             related_incidents.append(pair_incident[0])
             loop_number+=1
@@ -146,7 +146,7 @@ def list_incident_ssh(api_token, page_id):
         pair_incident = [incident_id, component_ids_isolated]
 
         # Check if the incident is related to Rasp VPN
-        if pair_incident[1] == remote_ssh_server_component_id:
+        if pair_incident[1] == callhome_windows_ssh_server_component_id:
             print(f"Incident ID {pair_incident[0]} is related to Remote SSH Server.")
             related_incidents.append(pair_incident[0])
             loop_number+=1
@@ -190,7 +190,7 @@ def raw_list_incident_ssh(api_token, page_id):
         pair_incident = [incident_id, component_ids_isolated]
 
         # Check if the incident is related to Rasp VPN
-        if pair_incident[1] == remote_ssh_server_component_id:
+        if pair_incident[1] == callhome_windows_ssh_server_component_id:
             print(f"Incident ID {pair_incident[0]} is related to Remote SSH Server.")
             related_incidents.append(pair_incident[0])
             loop_number+=1

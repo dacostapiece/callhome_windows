@@ -3,8 +3,13 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from config import mailserver, mailusername, mailpassword, source_mailaddress, dest_mailaddress, mailsubject_success, smtpport, mailsubject_failed, smtpport, mailsubject_success_updated
 import sys
+import os
 
-LOG_FILE = "/tmp/sendmail.log"
+# Define the log file path for Windows
+LOG_FILE = os.path.join(os.getcwd(), "logs", "sendmail.log")
+
+# Ensure the logs directory exists
+os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
 
 def log_message(message):
     with open(LOG_FILE, "a") as log_file:
