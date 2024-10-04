@@ -5,6 +5,9 @@ import os
 # Load environment variables from the .env file
 load_dotenv()
 
+#DEVICE
+deviceName = "CallHome Windows"
+
 # Mail settings
 mailserver = os.getenv('mailserver')
 smtpport = os.getenv('smtpport')
@@ -12,8 +15,8 @@ mailusername = os.getenv('mailusername')
 mailpassword = os.getenv('mailpassword')
 source_mailaddress = os.getenv('source_mailaddress')
 dest_mailaddress = os.getenv('dest_mailaddress')
-mailsubject_success = "MY RASP IP ADDRESSES ARE: "
-mailsubject_success_updated = "MY UPDATED RASP IP ADDRESSES ARE: "
+mailsubject_success = f"MY {deviceName} IP ADDRESSES ARE: "
+mailsubject_success_updated = f"MY UPDATED {deviceName} IP ADDRESSES ARE: "
 mailsubject_failed = "VPN Failed"
 
 # Remote VPN Target
@@ -30,7 +33,8 @@ impact_create_incident = "major"
 monitoring_at_create_incident = f"Falha registrada em {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
 body_create_incident = "VPN com falha, investigando"
 deliver_notifications_create_incident = True
-raspberry_vpn_component_id = "qxkt2r25bgrk"
+#raspberry_vpn_component_id = "qxkt2r25bgrk"
+callhome-windows_vpn_component_id = "02lg5flysstz"
 
 #API Update Incident - Status Panel
 name_update_incident = "VPN restabelecida"
@@ -45,10 +49,8 @@ impact_create_incident_ssh = "major"
 monitoring_at_create_incident_ssh = f"Falha registrada em {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
 body_create_incident_ssh = "SSH Server com falha, investigando"
 deliver_notifications_create_incident_ssh = True
-remote_ssh_server_component_id = "4rx3bm9yfyh0"
-
-#callback_vpn_component_id = "1xwlm9hny2gc"
-#callback_ssh_component_id = "dg89n8m7yjnn"
+#remote_ssh_server_component_id = "4rx3bm9yfyh0"
+callhome-windows_ssh_server_component_id = "qw9987p1w68f"
 
 #API Update Incident SSH- Status Panel
 name_update_incident_ssh = "SSH Server restabelecido"

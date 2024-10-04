@@ -53,6 +53,7 @@ def get_network_interfaces():
             print("Tunnel IP Addresses:")
             for addr in tunnel_ipaddresses:
                 print(f"  {addr}")
+                return addr
         else:
             print("No matching TAP-Windows Adapter with an IPv4 address found.")
     
@@ -71,5 +72,4 @@ def is_apipa_or_loopback(ip_address):
     
     return bool(apipa_pattern.match(ip_address) or loopback_pattern.match(ip_address))
 
-if __name__ == "__main__":
-    get_network_interfaces()
+get_tun0_ip = get_network_interfaces()

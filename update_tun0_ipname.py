@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
+import os
 import requests
 import ipaddress
 import subprocess
 import re
 from datetime import datetime
 from config import ZONE_ID, DNS_RECORD_ID, DNS_RECORD_NAME, CF_API_TOKEN
+from get_tun0_ip import myip_windows 
 
-LOG_FILE_PATH = "/tmp/update_tun0_ipname.log"
+# Define the log file path for Windows
+LOG_FILE_PATH = os.path.join(os.getcwd(), "logs", "update_tun0_ipname.log")
+
+# Ensure the logs directory exists
+os.makedirs(os.path.dirname(LOG_FILE_PATH), exist_ok=True)
 
 def log_run_time():
     """Logs the date and time the script was run to the log file."""
