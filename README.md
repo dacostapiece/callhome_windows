@@ -1,5 +1,7 @@
 Callhome Windows
 
+schtasks /create /sc minute /mo 5 /tn "update_tun0_ipname" /tr "python.exe C:\Users\rafael\Desktop\callhome_windows\update_tun0_ipname.py" /ru SYSTEM /f
+
 Create Scheduled Task
 schtasks /create /sc minute /mo 5 /tn "update_tun0_ipname" /tr "python.exe C:\path\to\file.py" /ru SYSTEM /f
 
