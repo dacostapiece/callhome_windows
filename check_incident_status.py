@@ -1,5 +1,9 @@
 import requests
-from config import callhome_windows_vpn_component_id, callhome_windows_ssh_server_component_id
+from config import callhome_windows_vpn_component_id, callhome_windows_ssh_server_component_id, home_dir
+
+# Define the log file path for Windows
+LOG_FILE = os.path.join(os.getcwd(), os.path.join(home_dir, "logs"), "check_incident_status_response.txt")
+LOG_FILE2 = os.path.join(os.getcwd(), os.path.join(home_dir, "logs"), "check_incident_status_response_ssh.txt")
 
 #HUB VPN INCIDENT
 def list_incident(api_token, page_id):
@@ -11,7 +15,7 @@ def list_incident(api_token, page_id):
     response_data = response.json()
 
     # Save response to a file
-    with open("check_incident_status_response.txt", "w") as file:
+    with open(LOG_FILE, "w") as file:
         file.write(response.text)
         print("Response saved to check_incident_status_response.txt")
 
@@ -115,7 +119,7 @@ def list_incident_ssh(api_token, page_id):
     response_data = response.json()
 
     # Save response to a file
-    with open("check_incident_status_response_ssh.txt", "w") as file:
+    with open(LOG_FILE2, "w") as file:
         file.write(response.text)
         print("Response saved to check_incident_status_response_ssh.txt")
 

@@ -6,10 +6,11 @@ from sendmail import send_mail_my_ip_is_updated, send_mail_vpn_failed
 import re
 from writeandreadip_tunip import writeip
 from myip_windows import is_ipv4, is_apipa_or_loopback
+from config import home_dir
 
 # Define the log file path for Windows
-LOG_FILE = os.path.join(os.getcwd(), "logs", "updated_interfaces.log")
-IFCONFIG_FILE = os.path.join(os.getcwd(), ".", "ipadd.txt")
+LOG_FILE = os.path.join(os.getcwd(), os.path.join(home_dir, "logs"), "updated_interfaces.log")
+IFCONFIG_FILE = os.path.join(os.getcwd(), os.path.join(home_dir, "ipadd.txt"))
 
 # Ensure the logs directory exists
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)

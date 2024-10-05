@@ -5,12 +5,12 @@ import ipaddress
 import subprocess
 import re
 from datetime import datetime
-from config import ZONE_ID, DNS_RECORD_ID, DNS_RECORD_NAME, CF_API_TOKEN
+from config import ZONE_ID, DNS_RECORD_ID, DNS_RECORD_NAME, CF_API_TOKEN, home_dir
 from myip_windows import get_network_interfaces 
 import pdb
 
 # Define the log file path for Windows
-LOG_FILE_PATH = os.path.join(os.getcwd(), "logs", "update_tun0_ipname.log")
+LOG_FILE_PATH = os.path.join(os.getcwd(), os.path.join(home_dir, "logs"), "update_tun0_ipname.log")
 
 # Ensure the logs directory exists
 os.makedirs(os.path.dirname(LOG_FILE_PATH), exist_ok=True)

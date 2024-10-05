@@ -1,6 +1,11 @@
 import requests
 from datetime import datetime
-from config import callhome_windows_vpn_component_id, callhome_windows_ssh_server_component_id
+from config import callhome_windows_vpn_component_id, callhome_windows_ssh_server_component_id, home_dir
+
+# Define the log file path for Windows
+LOG_FILE = os.path.join(os.getcwd(), os.path.join(home_dir, "logs"), "create_incident_response.txt")
+LOG_FILE2 = os.path.join(os.getcwd(), os.path.join(home_dir, "logs"), "create_pair_incident_response_vpn.txt")
+LOG_FILE3 = os.path.join(os.getcwd(), os.path.join(home_dir, "logs"), "create_incident_response_ssh.txt")
 
 #CREATE INCIDENT FOR RASPBERRY TO HUB VPN CONNECTION
 def create_incident(api_token, page_id, name, status, impact, monitoring_at, body):
@@ -20,7 +25,7 @@ def create_incident(api_token, page_id, name, status, impact, monitoring_at, bod
     response = requests.post(url, headers=headers, data=data)
 
     # Save response to a file
-    with open("create_incident_response.txt", "w") as file:
+    with open(LOG_FILE, "w") as file:
         file.write(response.text)
 
     print("An incident has been created.")
@@ -46,7 +51,7 @@ def create_incident(api_token, page_id, name, status, impact, monitoring_at, bod
 
     # Save Pair Incident to a file
     print("Response saved to create_pair_incident_response_vpn.txt")
-    with open("create_pair_incident_response_vpn.txt", "w") as file:
+    with open(LOG_FILE2, "w") as file:
         file.write(str(pair_incident))
     
     return pair_incident
@@ -69,7 +74,7 @@ def create_incident_ssh(api_token, page_id, name, status, impact, monitoring_at,
     response = requests.post(url, headers=headers, data=data)
 
     # Save response to a file
-    with open("create_incident_response_ssh.txt", "w") as file:
+    with open(LOG_FILE3, "w") as file:
         file.write(response.text)
 
     print("An incident has been created.")

@@ -1,6 +1,10 @@
 import requests
 import json
-from config import callhome_windows_vpn_component_id, callhome_windows_ssh_server_component_id
+from config import callhome_windows_vpn_component_id, callhome_windows_ssh_server_component_id, home_dir
+
+# Define the log file path for Windows
+LOG_FILE = os.path.join(os.getcwd(), os.path.join(home_dir, "logs"), "update_incident.txt")
+LOG_FILE2 = os.path.join(os.getcwd(), os.path.join(home_dir, "logs"), "update_incident_ssh.txt")
 
 #UPDATE INCIDENT FOR HUB VPN
 def update_incident(api_token, page_id, incident_id, name, status, updated_at, body):
@@ -19,7 +23,7 @@ def update_incident(api_token, page_id, incident_id, name, status, updated_at, b
     response = requests.patch(url, headers=headers, data=data)
 
     # Save response to a file
-    with open("update_incident.txt", "w") as file:
+    with open(LOG_FILE, "w") as file:
         file.write(response.text)
 
     print("Incident updated. Response saved to update_incident.txt")
@@ -45,7 +49,7 @@ def update_incident_ssh(api_token, page_id, incident_id, name, status, updated_a
     response = requests.patch(url, headers=headers, data=data)
 
     # Save response to a file
-    with open("update_incident_ssh.txt", "w") as file:
+    with open(LOG_FILE2, "w") as file:
         file.write(response.text)
 
     print("Incident updated. Response saved to update_incident_ssh.txt")

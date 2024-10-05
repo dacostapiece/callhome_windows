@@ -1,6 +1,6 @@
 import subprocess
 import time
-from config import vpn_probe_target, ssh_server, ssh_port
+from config import vpn_probe_target, ssh_server, ssh_port, home_dir
 import re
 import socket
 import sys
@@ -11,7 +11,7 @@ from myip_windows import is_ipv4, is_apipa_or_loopback
 import json
 
 # Define the log file path for Windows
-LOG_FILE_PATH = os.path.join(os.getcwd(), "logs", "tunnel_connection.log")
+LOG_FILE_PATH = os.path.join(os.getcwd(), os.path.join(home_dir, "logs"), "tunnel_connection.log")
 
 # Ensure the logs directory exists
 os.makedirs(os.path.dirname(LOG_FILE_PATH), exist_ok=True)

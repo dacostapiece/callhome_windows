@@ -85,3 +85,6 @@ key_password = os.getenv('SSH_KEY_PASSWORD')
 #SSH SERVER - SEND INFO
 ssh_server_filename_directory = os.getenv('ssh_server_filename_directory')
 ssh_server_filename = os.getenv('SSH_SERVER_FILENAME')
+
+#HOME DIRECTORY
+home_dir = r"C:\Users\rafael\Desktop\callhome_windows"
