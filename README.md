@@ -1,5 +1,8 @@
 Callhome Windows
 
+wevtutil set-log Microsoft-Windows-TaskScheduler/Operational /enabled:true
+
+
 schtasks /create /sc minute /mo 5 /tn "update_tun0_ipname" /tr "python.exe C:\Users\rafael\Desktop\callhome_windows\update_tun0_ipname.py" /ru SYSTEM /f
 
 Create Scheduled Task
