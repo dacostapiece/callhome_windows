@@ -60,12 +60,8 @@ def update_dns_record(ip):
         with open(LOG_FILE_PATH, 'a') as log_file:
             log_file.write(f"Failed to fetch DNS record ID.\n")
 
-def main():
-    tun0_ip = get_network_interfaces()
-    log_run_time()  # Fixed indentation here
-    #pdb.set_trace()
-    if tun0_ip:
-        update_dns_record(tun0_ip)
-
-if __name__ == "__main__":
-    main()
+tun0_ip = get_network_interfaces()
+log_run_time()  # Fixed indentation here
+#pdb.set_trace()
+if tun0_ip:
+    update_dns_record(tun0_ip)
