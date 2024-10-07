@@ -44,3 +44,6 @@ get cloudflare dns id
 update dns name
 
 update home_dir
+
+do not interrumpt battery
+reactivate to run it
