@@ -1,5 +1,36 @@
 Callhome Windows
 
+Download OpenVPN (not Connect version)
+
+https://openvpn.net/community-downloads/
+https://swupdate.openvpn.org/community/releases/OpenVPN-2.6.12-I001-amd64.msi
+
+Install
+
+Add it to path
+C:\Program Files\OpenVPN\bin
+System/Advanced Settings/Environment Variables
+System variables - edit, add new
+
+Close all prompt Windows
+Test it
+openvpn
+
+Get *.ovpn file and create pass.txt like
+username
+password
+
+Test it
+openvpn --config "path\to\your\config.ovpn" --auth-user-pass pass.txt
+
+add these lines below in *.ovpn file
+auth-user-pass pass.txt
+data-ciphers AES-256-CBC
+tls-cipher "DEFAULT:@SECLEVEL=0"
+then add *.ovpn file and pass.file to 
+C:\Program Files\OpenVPN\config-auto
+services.msc - logon as administrator username
+
 schtasks /create /sc minute /mo 5 /tn "update_tun0_ipname" /tr "C:\Users\rafael\AppData\Local\Programs\Python\Python312\python.exe C:\callhome_windows\update_tun0_ipname.py" /ru SYSTEM /f
 
 wevtutil set-log Microsoft-Windows-TaskScheduler/Operational /enabled:true
