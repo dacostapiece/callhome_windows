@@ -80,6 +80,7 @@ do not interrumpt battery
 reactivate to run it
 
 <h1>Sample .env</h1>
+
 ```bash
 #.env
 
