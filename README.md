@@ -78,3 +78,47 @@ update home_dir
 
 do not interrumpt battery
 reactivate to run it
+
+<h1>Sample .env</h1>
+```bash
+#.env
+
+# Mail settings
+mailserver = 'smtp.gmail.com'
+smtpport = 587
+mailusername = 'dacostapiecealerts@gmail.com'
+mailpassword = 'bknd izkv zbhr jogq'
+source_mailaddress = 'dacostapiecealerts@gmail.com'
+dest_mailaddress = 'dacostapiecealerts@gmail.com'
+
+# Remote VPN Target
+vpn_probe_target = "10.0.10.1"
+
+#API General Settings
+api_token = "2a93dea3212543298c99b5216b0e5e12"
+page_id = "qb7hs0ds4l0d"
+
+#TESTE
+env_var = "hello, i'm a env var"
+
+# Cloudflare API credentials
+CF_API_TOKEN = 'Qv5b8bePRqrJNti0qifoPzLJpyq4NxZD1-nO4xaq'
+
+# Cloudflare Zone ID and DNS record information
+ZONE_ID = '615bfd2ecd68639dab792dbc57a2bdca'
+DNS_RECORD_NAME = 'cw.dacostapiece.com.br'
+DNS_RECORD_ID = '2e2f8b41f8b4b717150259f968f5f361'
+
+# SSH settings
+SSH_USER = 'kali'
+SSH_SERVER = 'home.dacostapiece.com.br'
+#SSH_SERVER = '192.168.12.162'
+SSH_OPTIONS = '-M 0 -f -N -R 2220:localhost:22 -R 5910:localhost:5900 '
+SSH_KEY_PASSWORD='SSH@2024/*'
+KEY_FILE = '/home/dacosta/.ssh/dacrasp'
+SSH_PORT = 22
+
+#SSH SERVER
+SSH_SERVER_FILENAME = "current_rasp_ip.txt"
+ssh_server_filename_directory = "/home/kali/CALLHOME_SSH_SERVER"
+```
